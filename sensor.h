@@ -45,7 +45,7 @@ struct PYR {
   void print();
 };
 
-struct Quaternion {
+struct Quaternion {//using this now
 
   float x;
   float y;
