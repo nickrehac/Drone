@@ -106,10 +106,6 @@ Quaternion FlightData::quaternionFromAccel(Vec3 accel) {
 
   Quaternion retval;
 
-  retval.pitch = atan2f(accel.x, accel.z)*DEGREES;
-  retval.yaw = 0.0f;
-  retval.roll = atan2f(accel.y, accel.z)*DEGREES;
-
   return retval;
   
 }
@@ -125,14 +121,17 @@ void FlightData::update(float dtime) {
   float gyroAngle = gyroMagnitude * dtime * RADIANS;
   float gyroMagnitudeDtimeSine = sinf(gyroAngle);
 
-  Quaternion instantGyroChange = {
+  Quaternion attitudeGyroTransform = {
     gyro.x * gyroMagnitudeDtimeSine,
     gyro.y * gyroMagnitudeDtimeSine,
     gyro.z * gyroMagnitudeDtimeSine,
     cosf(gyroAngle)
   };
 
-  
+  Quaternion orientationFromAccel;
+
+  attitude = attitude.multiply(attitudeGyroTransform).lerp(orientationFromAccel, GYRO_CORRECTION_RATE * dtime);
+  attitude.normalize();
   
 }
 

@@ -136,6 +136,16 @@ struct Quaternion {//using this now
 
     return retval;
   }
+
+  inline Quaternion lerp(Quaternion b, float x) {
+    float xi = 1.0f - x;
+    return Quaternion{
+      this->x*xi + b.x*x,
+      this->y*xi + b.y*x,
+      this->z*xi + b.z*x,
+      this->w*xi + b.w*x
+    };
+  }
   
 };
 

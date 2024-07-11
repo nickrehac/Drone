@@ -39,7 +39,7 @@ FlightControl::FlightControl() :
 
 
 void FlightControl::update(Quaternion reading, float dtime) {
-
+/*
   float pitch = pitchPID.update(reading.pitch, dtime);
   float yaw = yawPID.update(reading.yaw, dtime);
   float roll = rollPID.update(reading.roll, dtime);
@@ -85,16 +85,13 @@ void FlightControl::update(Quaternion reading, float dtime) {
   analogWrite(FR_MOTOR, constrain(mFR, 0.0f, 1.0f)*255);
   analogWrite(BL_MOTOR, constrain(mBL, 0.0f, 1.0f)*255);
   analogWrite(BR_MOTOR, constrain(mBR, 0.0f, 1.0f)*255);
+
+  */
   
 }
 
 
-void FlightControl::setTarget(PYR target) {
-
-  pitchPID.target = target.pitch;
-  yawPID.target = target.yaw;
-  rollPID.target = target.roll;
-  
+void FlightControl::setTarget(Quaternion target) {
 }
 
 

@@ -61,8 +61,8 @@ void handle_request() {
     switch(firstByte) {
       
       case 0:
-        client.read((char*)buf, 4*sizeof(float));
-        flightControl.setTarget(*(PYR *)buf);
+        client.read((char*)buf, 5*sizeof(float));
+        flightControl.setTarget(*(Quaternion *)buf);
         flightControl.throttle = buf[3];
         break;
         
