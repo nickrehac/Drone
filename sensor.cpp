@@ -53,9 +53,9 @@ FlightData::FlightData() {
   displacement.y = 0.0f;
   displacement.z = 0.0f;
 
-  attitude.pitch = SENSOR_TILT;
-  attitude.yaw = 0.0f;
-  attitude.roll = 0.0f;
+  attitude = Quaternion::fromPYR(PYR{SENSOR_TILT, 0.0f, 0.0f});
+
+  lastNormalization = 0;
   
 }
 
@@ -102,9 +102,9 @@ void FlightData::calibrate() {
 }
 
 
-PYR FlightData::pyrFromAccel(Vec3 accel) {
+Quaternion FlightData::quaternionFromAccel(Vec3 accel) {
 
-  PYR retval;
+  Quaternion retval;
 
   retval.pitch = atan2f(accel.x, accel.z)*DEGREES;
   retval.yaw = 0.0f;
@@ -119,30 +119,31 @@ void FlightData::update(float dtime) {
 
   gyro = getGyro();
   accel = getAccel();
-  PYR accelPYR = pyrFromAccel(accel);
 
-  float pitchCorrection = (accelPYR.pitch - attitude.pitch) * GYRO_CORRECTION_RATE;
-  float yawCorrection = (accelPYR.yaw - attitude.yaw) * GYRO_CORRECTION_RATE;
-  float rollCorrection = (accelPYR.roll - attitude.roll) * GYRO_CORRECTION_RATE;
-
-  float newPitch
-
-  float pitchChange = gyro.y * cos(attitude.roll*RADIANS) + gyro.z * -sin(attitude.roll * RADIANS);
-  float yawChange = gyro.z * cos(attitude.roll*RADIANS) + gyro.y * sin(attitude.roll * RADIANS);
-  float rollChange = gyro.x;
+  float gyroMagnitude = sqrtf(gyro.x*gyro.x + gyro.y*gyro.y + gyro.z*gyro.z);
   
-  attitude.pitch -= (pitchChange - pitchCorrection) * dtime;
-  attitude.yaw += (yawChange + yawCorrection) * dtime;
-  attitude.roll += (rollChange + rollCorrection) * dtime;
+  float gyroAngle = gyroMagnitude * dtime * RADIANS;
+  float gyroMagnitudeDtimeSine = sinf(gyroAngle);
+
+  Quaternion instantGyroChange = {
+    gyro.x * gyroMagnitudeDtimeSine,
+    gyro.y * gyroMagnitudeDtimeSine,
+    gyro.z * gyroMagnitudeDtimeSine,
+    cosf(gyroAngle)
+  };
+
+  
   
 }
 
 
-PYR FlightData::getAttitude() {//calculate attitude from corrected data
+Quaternion FlightData::getAttitude() {//calculate attitude from corrected data
   
-  PYR retval = attitude;
+  Quaternion retval = attitude;
 
-  retval.pitch -= SENSOR_TILT;
+  const Quaternion pitchAdjust = Quaternion::fromPYR(PYR{-SENSOR_TILT, 0.0f, 0.0f});
+
+  retval = retval.multiply(pitchAdjust);
   
   return retval;
   
@@ -152,14 +153,6 @@ PYR FlightData::getAttitude() {//calculate attitude from corrected data
 Vec3 FlightData::isolatedAccel() {
   
   Vec3 retval = accel;
-    
-  float biasX = sinf(attitude.pitch * RADIANS);
-  float biasZ = cosf(attitude.pitch * RADIANS) + cosf(attitude.roll * RADIANS) - 1.0f;
-  float biasY = sinf(attitude.roll * RADIANS);
-
-  retval.x -= biasX;
-  retval.y -= biasY;
-  retval.z -= biasZ;
 
   return retval;
   

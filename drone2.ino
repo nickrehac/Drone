@@ -33,8 +33,8 @@ void handle_request() {
     switch(firstByte) {
       
       case 0: {
-        PYR attitude = flightData.getAttitude();
-        client.write((char *) &attitude, sizeof(PYR));
+        Quaternion attitude = flightData.getAttitude();
+        client.write((char *) &attitude, sizeof(Quaternion));
         break;
       }
 

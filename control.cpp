@@ -38,7 +38,7 @@ FlightControl::FlightControl() :
 }
 
 
-void FlightControl::update(PYR reading, float dtime) {
+void FlightControl::update(Quaternion reading, float dtime) {
 
   float pitch = pitchPID.update(reading.pitch, dtime);
   float yaw = yawPID.update(reading.yaw, dtime);

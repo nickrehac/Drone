@@ -32,9 +32,9 @@ struct FlightControl {
   float throttle;
   
   FlightControl();
-  void update(PYR readings, float dtime);
+  void update(Quaternion reading, float dtime);
   void setMotors(float pitch, float yaw, float roll, float throttle);
-  void setTarget(PYR target);
+  void setTarget(Quaternion target);
   
 };
 

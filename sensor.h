@@ -21,6 +21,8 @@
 
 #define GYRO_CORRECTION_RATE 0.5f
 
+#define RENORMALIZATION_THRESHOLD 10
+
 #include <Wire.h>
 #include <Arduino.h>
 
@@ -140,7 +142,7 @@ struct Quaternion {//using this now
 struct FlightData {
   FlightData();
   Vec3 displacement;
-  PYR attitude;
+  Quaternion attitude;
   PYR perceivedDown;//direction sensor believes is down
   Vec3 gyroOffset;
   Vec3 accelOffset;
@@ -148,14 +150,16 @@ struct FlightData {
   Vec3 gyro;
   Vec3 accel;
 
+  int lastNormalization;
+
   void calibrate();
   Vec3 getAccel();
   Vec3 getGyro();
   Vec3 isolatedAccel();
-  PYR getAttitude();
+  Quaternion getAttitude();
   void update(float dtime);
 
-  static PYR pyrFromAccel(Vec3 accel);
+  static Quaternion quaternionFromAccel(Vec3 accel);
 };
 
 void initSensor();
