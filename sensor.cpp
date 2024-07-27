@@ -46,6 +46,18 @@ void PYR::print() {
     
 }
 
+void Quaternion::print() {
+
+  Serial.print("W:");
+  Serial.print(w);
+  Serial.print(" X:");
+  Serial.print(x);
+  Serial.print(" Y:");
+  Serial.print(y);
+  Serial.print(" Z:");
+  Serial.print(z);
+}
+
 
 FlightData::FlightData() {
   
@@ -104,9 +116,12 @@ void FlightData::calibrate() {
 
 Quaternion FlightData::quaternionFromAccel(Vec3 accel) {
 
-  Quaternion retval;
-
-  return retval;
+  return Quaternion {
+    -accel.y / sqrtf(2*accel.z + 2.0f),
+    accel.x / sqrtf(2*accel.z + 2.0f),
+    0,
+    sqrtf((accel.z + 1.0f)/2.0f)
+  };
   
 }
 
@@ -128,9 +143,9 @@ void FlightData::update(float dtime) {
     cosf(gyroAngle)
   };
 
-  Quaternion orientationFromAccel;
+  Quaternion orientationFromAccel = quaternionFromAccel(accel);
 
-  attitude = attitude.multiply(attitudeGyroTransform).lerp(orientationFromAccel, GYRO_CORRECTION_RATE * dtime);
+  attitude = attitude.multiply(attitudeGyroTransform);//.lerp(orientationFromAccel, GYRO_CORRECTION_RATE * dtime);
   attitude.normalize();
   
 }
