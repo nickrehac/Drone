@@ -154,7 +154,7 @@ void loop() {
   flightData.update(dtime);
   flightControl.update(flightData.getAttitude(), dtime);
 
-  flightData.attitude.print();
+  flightData.getAttitude().print();
 
 
   

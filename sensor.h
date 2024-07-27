@@ -137,9 +137,16 @@ struct Quaternion {//using this now
     return retval;
   }
 
-  inline Quaternion lerp(Quaternion b, float x) {
+  inline Quaternion lerp(Quaternion b, float x, bool freeZAxis) {
     float xi = 1.0f - x;
-    return Quaternion{
+
+    if(freeZAxis) return Quaternion{
+      this->x*xi + b.x*x,
+      this->y*xi + b.y*x,
+      this->z,
+      this->w*xi + b.w*x
+    };
+    else return Quaternion{
       this->x*xi + b.x*x,
       this->y*xi + b.y*x,
       this->z*xi + b.z*x,

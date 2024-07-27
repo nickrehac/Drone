@@ -13,7 +13,7 @@ void initSensor() {
 
 void IVec3::print() {
   
-    Serial.print("x:");
+    Serial.print(" x:");
     Serial.print(x);
     Serial.print(" y:");
     Serial.print(y);
@@ -25,7 +25,7 @@ void IVec3::print() {
 
 void Vec3::print() {
   
-    Serial.print("x:");
+    Serial.print(" x:");
     Serial.print(x);
     Serial.print(" y:");
     Serial.print(y);
@@ -37,7 +37,7 @@ void Vec3::print() {
 
 void PYR::print() {
   
-    Serial.print("pitch:");
+    Serial.print(" pitch:");
     Serial.print(pitch);
     Serial.print(" yaw:");
     Serial.print(yaw);
@@ -48,7 +48,7 @@ void PYR::print() {
 
 void Quaternion::print() {
 
-  Serial.print("W:");
+  Serial.print(" W:");
   Serial.print(w);
   Serial.print(" X:");
   Serial.print(x);
@@ -137,29 +137,25 @@ void FlightData::update(float dtime) {
   float gyroMagnitudeDtimeSine = sinf(gyroAngle);
 
   Quaternion attitudeGyroTransform = {
-    gyro.x * gyroMagnitudeDtimeSine,
-    gyro.y * gyroMagnitudeDtimeSine,
-    gyro.z * gyroMagnitudeDtimeSine,
+    -gyro.x * gyroMagnitudeDtimeSine / gyroMagnitude,
+    -gyro.y * gyroMagnitudeDtimeSine / gyroMagnitude,
+    -gyro.z * gyroMagnitudeDtimeSine / gyroMagnitude,
     cosf(gyroAngle)
   };
 
   Quaternion orientationFromAccel = quaternionFromAccel(accel);
 
-  attitude = attitude.multiply(attitudeGyroTransform);//.lerp(orientationFromAccel, GYRO_CORRECTION_RATE * dtime);
+  attitude = attitude.multiply(attitudeGyroTransform).lerp(orientationFromAccel, GYRO_CORRECTION_RATE * dtime, true);
   attitude.normalize();
   
 }
 
 
 Quaternion FlightData::getAttitude() {//calculate attitude from corrected data
-  
-  Quaternion retval = attitude;
 
   const Quaternion pitchAdjust = Quaternion::fromPYR(PYR{-SENSOR_TILT, 0.0f, 0.0f});
 
-  retval = retval.multiply(pitchAdjust);
-  
-  return retval;
+  return attitude.multiply(pitchAdjust);
   
 }
 
